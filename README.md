@@ -7,7 +7,7 @@ The agent takes a user’s query and time period, researches the topic, summariz
 
 ---
 
-## 🖼️ Workflow Overview
+## Workflow Overview
 
 Here’s the workflow as designed in n8n:
 
