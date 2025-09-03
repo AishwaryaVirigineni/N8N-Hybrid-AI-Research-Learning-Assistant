@@ -1,0 +1,578 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Search Form",
+        "formDescription": "input search query to create audio version of specific topic",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic",
+              "placeholder": "vibecoding"
+            },
+            {
+              "fieldLabel": "time period",
+              "placeholder": "past 6 months"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        132
+      ],
+      "id": "98aff71e-848f-4ad5-a2dc-d378b7c80fec",
+      "name": "On form submission",
+      "webhookId": "<WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Role\nYou are a research and learning AI agent. Your role is to take a user\u2019s query and time period, search reputable and primary sources using the Perplexity API, and produce a clear, engaging summary optimized for audio narration. You also store the final summary as a simple memory.\n\nInputs\n\nUser Query: {{$json['Topic'] }}\n\nTime Period: {{ $json['time period'] }}\n\nTask\n\nReceive the user\u2019s query and time period.\n\nUse the Perplexity API to gather information from reputable and, wherever possible, primary sources.\n\nCross-verify facts across multiple sources to ensure reliability.\n\nExtract the most relevant, high-quality information within the given time period.\n\nWrite a concise yet informative summary that:\n\nIs optimized for audio delivery (smooth flow, natural phrasing, clear transitions).\n\nHighlights key points first, then elaborates with details.\n\nAvoids excessive jargon and long, complex sentences.\n\nReturn the final text summary.\n\nAlso return the summary as a simple memory.\n\nOutput\n\nA single, polished text summary of <USER_PROVIDED_QUERY> within <USER_PROVIDED_TIME_PERIOD>.\n\nThe tone must be clear, engaging, and conversational, designed to be read aloud smoothly.\n\nThe structure should begin with a short introduction, followed by key insights in logical order, and end with a concise closing statement.\n\nAlso return it as a simple memory for recall later.\n\nConstraints\n\nOnly use reputable and preferably primary sources.\n\nEnsure all facts are up to date and consistent with the specified time period.\n\nDo not hallucinate or invent information.\n\nDo not include source citations in the summary text itself; focus on narration-friendly flow.\n\nKeep length appropriate for audio: concise but complete (roughly 2\u20135 minutes spoken length).\n\nCapabilities & Reminders\n\nUse the Perplexity API for searching and retrieving information.\n\nPrioritize primary sources, government sites, academic papers, and established news outlets.\n\nSummarization style must be optimized for listening comprehension (short sentences, clear emphasis, smooth transitions).\n\nAlways double-check consistency across sources.\n\nRemember to also return the final output as a simple memory.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        456,
+        228
+      ],
+      "id": "db20ca51-90a2-40ff-ae35-87a7730bd50e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-16k",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo-16k"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        452
+      ],
+      "id": "cc29fa3a-8fc1-4602-b022-02d9f06ac4e0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "6eZRLoKOYiIDG9r8",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "simplify": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify_Output', ``, 'boolean') }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        656,
+        452
+      ],
+      "id": "a38fe025-00f1-4700-92db-97a524e802b2",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "BO9Jko82sY3SGRC3",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "summary"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        452
+      ],
+      "id": "c8c1ddba-5138-4985-8518-da8b921f2392",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $('No Operation, do nothing1').item.json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1664,
+        -16
+      ],
+      "id": "07d82e69-fbee-4959-a977-98e5c4fd5df6",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "6eZRLoKOYiIDG9r8",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "<YOUR_EMAIL>",
+        "subject": "Topic Summary",
+        "message": "Here's the audio file:",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {},
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        -16
+      ],
+      "id": "dc5837c7-b9e2-422c-aef4-5b3f240b26dc",
+      "name": "Send a message",
+      "webhookId": "<WEBHOOK_ID>",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lTiGQsZhmIXYxPZC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "classify",
+        "input": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1088,
+        80
+      ],
+      "id": "d43c99bb-24cb-4d31-a359-47252c97575a",
+      "name": "Classify text for violations",
+      "credentials": {
+        "openAiApi": {
+          "id": "6eZRLoKOYiIDG9r8",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.flagged.toString()}}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a15b1143-6747-49ae-9dd3-a7efd6dc8168"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "abef385d-6196-45e4-a4fa-34565b6cf651",
+                    "leftValue": "={{ $json.flagged.toString()}}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1376,
+        80
+      ],
+      "id": "b4b9305b-a4a0-4d9b-a09c-3ef66f95c059",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "<YOUR_EMAIL>",
+        "subject": "Summary Error",
+        "message": "There is a text violation flag. sorry about that, exiting!!!!, please check for more details",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1664,
+        176
+      ],
+      "id": "9bf9ce93-50c2-4418-83a2-2a9113280262",
+      "name": "Send a message1",
+      "webhookId": "<WEBHOOK_ID>",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lTiGQsZhmIXYxPZC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "<GOOGLE_SHEET_NAME>",
+          "cachedResultUrl": "<GOOGLE_SHEET_URL>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEET_TAB>",
+          "mode": "list",
+          "cachedResultName": "<GOOGLE_SHEET_TAB_NAME>",
+          "cachedResultUrl": "<GOOGLE_SHEET_TAB_URL>"
+        }
+      },
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "typeVersion": 4.6,
+      "position": [
+        -48,
+        324
+      ],
+      "id": "fa7ab995-951f-4fff-a31d-8fbd3c2d3211",
+      "name": "When fetching a dataset row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3oYUIIf1ijHle376",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        176,
+        228
+      ],
+      "id": "44c4f7a1-ed38-4698-bdfc-cc89176274de",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        864,
+        228
+      ],
+      "id": "92f4fd2f-9d09-44ef-bb44-22509f4e96b9",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "<GOOGLE_SHEET_NAME>",
+          "cachedResultUrl": "<GOOGLE_SHEET_URL>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEET_TAB>",
+          "mode": "list",
+          "cachedResultName": "<GOOGLE_SHEET_TAB_NAME>",
+          "cachedResultUrl": "<GOOGLE_SHEET_TAB_URL>"
+        },
+        "outputs": {
+          "values": [
+            {
+              "outputName": "output",
+              "outputValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        384
+      ],
+      "id": "81428d3f-c148-4ef9-ad5a-f08f890299aa",
+      "name": "Evaluation",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3oYUIIf1ijHle376",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "setMetrics",
+        "metric": "helpfulness",
+        "userQuery": "query",
+        "actualAnswer": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        376
+      ],
+      "id": "4269997e-076b-41ad-9a34-fd758690e95c",
+      "name": "Evaluation1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1384,
+        600
+      ],
+      "id": "b0d1f770-83cb-46d3-a723-83ba562dbe84",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "6eZRLoKOYiIDG9r8",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify text for violations": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When fetching a dataset row": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing1": {
+      "main": [
+        [
+          {
+            "node": "Evaluation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Classify text for violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8831398d-4b2f-43e6-9982-8073c9e50b35",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "96c6ca8ffacb8384f1ce0292d5e62ff70f8223b503506d2642c093b61ab7add0"
+  },
+  "id": "oiHUtWPnOoUWEdHm",
+  "tags": []
+}
