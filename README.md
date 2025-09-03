@@ -3,8 +3,6 @@
 This repository contains an **AI agent workflow built with [n8n](https://n8n.io/)**.  
 The agent takes a user’s query and time period, researches the topic, summarizes the findings, converts the summary into audio, and emails the audio file back to the user.  
 
-💡 **Note**: This project started as a tutorial I followed to learn n8n. I’m documenting it here as part of my learning journey, and I plan to extend/customize it further.  
-
 ---
 
 ## Workflow Overview
@@ -72,13 +70,4 @@ Here’s the workflow as designed in n8n:
 - Integrating **Perplexity API** for trusted research.  
 - Setting up **content moderation** and conditional routing with Switch nodes.  
 - Running **evaluation loops** with Google Sheets and OpenAI-based scoring.  
-
----
-
-## 📌 Next Steps
-- Extend to support **more output formats** (PDF, transcript).  
-- Swap Gmail with a different email service.  
-- Add a **frontend web interface** for better user interaction.  
-- Improve evaluation metrics (accuracy, clarity, factuality).  
-
 
