@@ -1,4 +1,4 @@
-# 📚 N8N Hybrid AI Research & Learning Assistant
+# N8N Hybrid AI Research & Learning Assistant
 
 This repository contains an **AI agent workflow built with [n8n](https://n8n.io/)**.  
 The agent takes a user’s query and time period, researches the topic, summarizes the findings, converts the summary into audio, and emails the audio file back to the user.  
@@ -82,8 +82,4 @@ Here’s the workflow as designed in n8n:
 - Add a **frontend web interface** for better user interaction.  
 - Improve evaluation metrics (accuracy, clarity, factuality).  
 
----
-
-## ⚠️ Disclaimer
-This is a **learning project** and is not intended for production use.  
 
