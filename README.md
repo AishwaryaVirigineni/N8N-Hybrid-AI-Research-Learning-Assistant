@@ -12,7 +12,6 @@ The agent takes a user’s query and time period, researches the topic, summariz
 Here’s the workflow as designed in n8n:
 
 ![n8n workflow](./workflow.png)  
-*(Replace `workflow.png` with the actual path if you save the screenshot in the repo)*
 
 ---
 
